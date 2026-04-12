@@ -90,9 +90,7 @@
   }
 
   async function submitUrl(url: string) {
-    // Phase 7 will swap this for /api/entries/url. For now, post as text so
-    // the message still shows up (Phase 5 only ships the text path).
-    const created = await postJson<TimelineEntry>('/api/entries/text', { body: url });
+    const created = await postJson<TimelineEntry>('/api/entries/url', { url });
     entries = [...entries, created];
   }
 
