@@ -38,8 +38,8 @@ CI runs all four on every push to `main` and on every pull request.
 
 ## Deployment
 
-Production runs on Cloudflare Pages at a `*.pages.dev` subdomain. See the
+Production runs on Cloudflare Pages. See the
 [quickstart runbook](specs/001-sharebox-mvp/quickstart.md) for the exact
 binding, secret, and OAuth client setup.
 
-> Production URL: _to be filled in after the first deploy._
+> Production URL: <https://sharebox-dls.pages.dev/>
