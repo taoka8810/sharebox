@@ -3,11 +3,7 @@ import type { Cookies } from '@sveltejs/kit';
 const SESSION_COOKIE = 'session';
 const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 30;
 
-export function setSessionTokenCookie(
-  cookies: Cookies,
-  token: string,
-  secure: boolean
-): void {
+export function setSessionTokenCookie(cookies: Cookies, token: string, secure: boolean): void {
   cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',

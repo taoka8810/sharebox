@@ -15,6 +15,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 `@oslojs/encoding` を用いた自前セッション管理。Lucia ライブラリ本体は使用しない。
 
 **Rationale**:
+
 - Lucia v3 は 2025 年に作者 (pilcrowonpaper) によってメンテナンス終了が宣言され、
   代わりに「Arctic で OAuth フローを処理し、セッションは自前テーブルで管理する」
   パターンが `lucia-auth.com` の公式チュートリアルで推奨されている。
@@ -26,6 +27,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   にラップされており、自前実装の落とし穴 (timing attack 等) を回避できる。
 
 **Alternatives considered**:
+
 - **Lucia v3 を使う**: メンテ終了済みのため将来的なセキュリティパッチが得られず、
   Principle V (品質) と将来の保守性に反する。
 - **Auth.js (NextAuth) for SvelteKit**: 抽象が分厚く、Cloudflare Workers ランタイム
@@ -48,6 +50,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 `wrangler d1 migrations apply` で適用する。
 
 **Rationale**:
+
 - TypeScript の型から SQL スキーマを引けるため、テーブル変更時の影響範囲が
   コンパイル時に検出される。
 - 軽量 (gzip 後のランタイム約 ~10KB) で、ORM とは言うが薄い SQL ビルダーに近い。
@@ -57,6 +60,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   D1 マイグレーションツールに直接渡せる。
 
 **Alternatives considered**:
+
 - **生 SQL のみ**: 型安全性ゼロ。3 種類のエントリ用クエリを手書きで管理するのは
   ヒューマンエラーの温床。
 - **Prisma**: スキーマ DSL は強力だが、Workers ランタイムでの D1 サポートが歴史的
@@ -74,6 +78,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 当面導入しない)。
 
 **Rationale**:
+
 - `node-html-parser` は Workers 互換 (依存なし、~50KB)。CSS セレクタも限定的だが
   使え、`<meta property="og:*">` の抽出には十分。
 - 取得結果を D1 の `url_post.ogp_*` カラムに直接保存することで、別途 KV を導入
@@ -85,6 +90,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   ベースの早期打ち切り) ことで Worker CPU 時間を保護する。
 
 **Alternatives considered**:
+
 - **`cheerio`**: 高機能だが Node.js 依存があり、Workers 互換性に難あり。
 - **正規表現で抽出**: パース精度が低く、エンティティデコードや属性順序のばらつき
   に弱い。
@@ -101,6 +107,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 チェックして強制する。
 
 **Rationale**:
+
 - Cloudflare Workers の Request body サイズ上限は 100MB なので、50MB 制限は十分
   に収まる。
 - R2 への直接アップロード (signed URL) は実装上のメリットが薄く、代わりに認証
@@ -109,6 +116,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   クライアント側で取得できる (`fetch` API は進捗イベント非対応)。
 
 **Alternatives considered**:
+
 - **R2 Pre-signed URL**: スケール時のサーバー負荷軽減には有効だが、本アプリは
   単一ユーザーで負荷無視できるため過剰。
 - **Resumable upload (TUS 等)**: 50MB なので不要。
@@ -120,6 +128,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 ## R5. 画像/動画プレビュー戦略
 
 **Decision**:
+
 - 画像: ブラウザネイティブの `<img loading="lazy" decoding="async">` を使用し、
   `srcset` は使わない (生のオリジナル画像を返却)。AVIF / WebP 変換は Cloudflare
   Images が必要となり有料のため、MVP では行わない。
@@ -128,12 +137,14 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   情報からポスターフレームを使う。
 
 **Rationale**:
+
 - 単一ユーザー × 50MB 上限のため、画像最適化が無くても帯域・体感速度の問題は
   発生しない。Principle II (ゼロコスト) を優先。
 - `loading="lazy"` と `preload="metadata"` で Performance Goals (LCP < 2.5s) を
   満たせる見込み。
 
 **Alternatives considered**:
+
 - **Cloudflare Images (有料)**: コスト発生のため不採用。
 - **Workers 内で `wasm-image-resize` 等を使ったランタイム変換**: CPU 時間を消費
   し無料枠の CPU バーストを圧迫する可能性。
@@ -145,10 +156,12 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 
 **Decision**: Svelte 5 の runes (`$state`, `$derived`, `$effect`) のみで完結させ、
 ストアライブラリを別途導入しない。フォーム送信は SvelteKit の `use:enhance`
-+ form actions で進捗管理し、サーバーレスポンスから返ってくるデータでローカル
-状態を更新する。
+
+- form actions で進捗管理し、サーバーレスポンスから返ってくるデータでローカル
+  状態を更新する。
 
 **Rationale**:
+
 - Constitution Principle III で「クライアント側状態管理ライブラリは導入しない」
   と明記されている。
 - 単一ユーザー × タイムライン 1 つというシンプルさで、複雑な状態同期は不要。
@@ -165,6 +178,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 リフェッチに留める。WebSocket / SSE / Durable Objects は導入しない。
 
 **Rationale**:
+
 - 本アプリは「自分のデバイス間で意識的に切り替えて参照する」ユースケースであり、
   ミリ秒単位のリアルタイム性は不要。
 - 別デバイスでアプリを開いた瞬間や、タブをフォアグラウンドに戻した瞬間に最新
@@ -173,6 +187,7 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
   反する。
 
 **Alternatives considered**:
+
 - **Server-Sent Events (SSE) でタイムライン購読**: 一見シンプルだが Workers 上の
   長時間接続コストと複雑性が見合わない。
 - **Polling (定期 fetch)**: 不要なリクエストを増やし、結果的に体感は変わらない。
@@ -182,17 +197,20 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 ## R8. CI / デプロイパイプライン
 
 **Decision**: GitHub Actions で `lint → typecheck → vitest → playwright (Chromium
-+ Mobile WebKit)` を順に実行。`main` へのマージで Cloudflare Pages の Git
-インテグレーションが自動デプロイをトリガーする。Wrangler 経由のデプロイは行わない
-(Pages の Git 連携で完結)。
+
+- Mobile WebKit)` を順に実行。`main` へのマージで Cloudflare Pages の Git
+  インテグレーションが自動デプロイをトリガーする。Wrangler 経由のデプロイは行わない
+  (Pages の Git 連携で完結)。
 
 **Rationale**:
+
 - Pages の Git インテグレーションはゼロ設定でデプロイでき、Principle II
   (ゼロコスト + シンプル運用) に合致する。
 - Playwright は Chromium と Mobile WebKit の両方で実行することで、モバイル UI
   の主要シナリオを CI でカバーできる (Safari の挙動差異は実機確認で補完)。
 
 **Alternatives considered**:
+
 - **Wrangler でデプロイ**: シークレット管理 (`CLOUDFLARE_API_TOKEN`) が増え、
   Pages の自動連携と機能差がない。
 - **Vercel デプロイ**: SvelteKit のサポートはあるが Workers ランタイムは
@@ -207,11 +225,13 @@ D1 + R2 + Tailwind) は再検討対象外とし、その内側の具体的な選
 構造として持たない。
 
 **Rationale**:
+
 - 「将来にわたって 1 ユーザー」という Constitution Principle I に沿う。
 - DB に whitelist テーブルを作ると複数登録を許してしまい、原則違反の温床になる。
 - Secret 1 つの管理は最も単純で誤設定リスクが低い。
 
 **Alternatives considered**:
+
 - **環境変数 (`.env`)**: 本番では Cloudflare Pages の環境変数として設定可能だが、
   Secret として扱うほうが意図 (機密) が明示的。
 - **DB の `allowed_emails` テーブル**: 過剰汎化。Principle VI 違反。
@@ -225,12 +245,14 @@ Google OAuth のリダイレクト URI は `http://localhost:8788/login/google/c
 を Google Cloud Console に登録する (本番用とは別の OAuth クライアント)。
 
 **Rationale**:
+
 - Wrangler が D1 / R2 のローカルエミュレーションを公式サポートしており、本番と
   同じバインディング名で開発できる。
 - OAuth の Dev / Prod 分離は Google 側で複数 redirect URI 登録するか、別クライアント
   を作る運用で対処する。本アプリは個人用なので運用負荷は許容範囲。
 
 **Alternatives considered**:
+
 - **本番 D1 / R2 を直接指して開発**: データ汚染リスクとレート消費。
 - **モック実装**: テスト用には有効だが手動動作確認には実 binding が不可欠。
 

@@ -99,10 +99,7 @@ export const urlPost = sqliteTable(
     ogpFetchedAt: integer('ogp_fetched_at')
   },
   (table) => [
-    check(
-      'url_post_status_check',
-      sql`${table.ogpStatus} IN ('pending', 'success', 'failed')`
-    )
+    check('url_post_status_check', sql`${table.ogpStatus} IN ('pending', 'success', 'failed')`)
   ]
 );
 

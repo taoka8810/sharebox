@@ -57,7 +57,7 @@
   <div
     class="bg-badge-bg text-primary-text max-w-[78%] rounded-2xl rounded-tr-md px-4 py-2.5 shadow-[var(--shadow-card)]"
   >
-    <pre
-      class="font-sans text-[15px] leading-relaxed whitespace-pre-wrap break-words">{entry.text.body}</pre>
+    <pre class="font-sans text-[15px] leading-relaxed whitespace-pre-wrap break-words">{entry.text
+        .body}</pre>
   </div>
 </div>

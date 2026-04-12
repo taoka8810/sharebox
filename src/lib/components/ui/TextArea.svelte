@@ -5,6 +5,7 @@
     invalid?: boolean;
   }
 
+  // svelte-ignore custom_element_props_identifier
   let {
     invalid = false,
     class: className = '',
@@ -20,9 +21,4 @@
   );
 </script>
 
-<textarea
-  bind:value
-  {rows}
-  class="{base} {borderClass} {className}"
-  {...rest}
-></textarea>
+<textarea bind:value {rows} class="{base} {borderClass} {className}" {...rest}></textarea>

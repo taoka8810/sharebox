@@ -71,10 +71,13 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
       byteSize: fileField.size,
       category
     });
-  } catch (e) {
+  } catch {
     await deleteFile(platform.env.FILES, r2Key).catch(() => {});
     // Also remove the share_entry row if the file_post insert is what failed.
-    await db.delete(shareEntry).where(eq(shareEntry.id, id)).catch(() => {});
+    await db
+      .delete(shareEntry)
+      .where(eq(shareEntry.id, id))
+      .catch(() => {});
     throw error(500, 'db_insert_failed');
   }
 

@@ -17,9 +17,7 @@ test.describe('US2 — authenticated file sharing', () => {
     'set SHAREBOX_E2E_AUTH=1 with wrangler pages dev to run'
   );
 
-  test('upload a small image and see it appear at the bottom of the timeline', async ({
-    page
-  }) => {
+  test('upload a small image and see it appear at the bottom of the timeline', async ({ page }) => {
     await page.goto('/test/login');
     await page.goto('/');
     const fileChooserPromise = page.waitForEvent('filechooser');

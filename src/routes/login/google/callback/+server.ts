@@ -4,11 +4,7 @@ import { eq } from 'drizzle-orm';
 import { createDbClient } from '$lib/server/db/client';
 import { createGoogleProvider } from '$lib/server/auth/google';
 import { isAllowedEmail } from '$lib/server/auth/whitelist';
-import {
-  createSession,
-  generateSessionToken,
-  type SessionUser
-} from '$lib/server/auth/session';
+import { createSession, generateSessionToken, type SessionUser } from '$lib/server/auth/session';
 import { setSessionTokenCookie } from '$lib/server/auth/cookies';
 import { recordLoginAttempt } from '$lib/server/audit';
 import { user as userTable } from '$lib/server/db/schema';

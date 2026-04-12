@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "sharebox MVP — 個人用マルチデバイス共有Webアプリ。自分が所有する複数デバイス間でテキスト・ファイル・URLを素早く安全にやり取りする個人専用ツール。Google OAuth ホワイトリスト認証で本人以外のアクセスを拒否し、統合タイムライン上で3種類の投稿を時系列管理する。"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Authenticated text sharing across devices (Priority: P1)
 
@@ -138,7 +138,7 @@ og:description / og:image)を取得してカード形式で表示する。別デ
 - **ホワイトリスト外アカウントでのログイン試行**: 明示的に拒否し、ログを残す
   (不正ログインの痕跡を本人があとで確認できるよう)。
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -225,7 +225,7 @@ og:description / og:image)を取得してカード形式で表示する。別デ
   (600-1080px)・デスクトップ(>1080px)で同等の主要機能を利用できる。
 - **FR-033**: System MUST すべての画面で DESIGN.md に記載されたデザインシステム
   (カラーパレット、タイポグラフィ、余白、影、角丸)に準拠する。
-- **FR-034**: *(撤回)* — 旧: 総ストレージ使用量を本人に可視化する。個人用 MVP に
+- **FR-034**: _(撤回)_ — 旧: 総ストレージ使用量を本人に可視化する。個人用 MVP に
   不要と判断し撤回。番号は履歴のため保持し、FR の renumber は行わない。
 - **FR-035**: System MUST Core Web Vitals の "Good" 閾値(LCP < 2.5s,
   INP < 200ms, CLS < 0.1)をすべての主要画面で満たす。
@@ -248,7 +248,7 @@ og:description / og:image)を取得してカード形式で表示する。別デ
   結果(成功 / ホワイトリスト拒否 / OAuth 失敗)、発信元 IP 相当の情報を保持
   する。本人が後から不正アクセスの痕跡を確認するために使用する。
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -268,7 +268,7 @@ og:description / og:image)を取得してカード形式で表示する。別デ
 - **SC-007**: 本番運用コストが **月額 0 円** で維持され、無料枠を超過しない。
 - **SC-008**: 本番環境に無料サブドメインでデプロイされ、本人のスマホ・PC 双方
   から問題なくアクセスできる。
-- **SC-009**: *(撤回)* — 旧: 総ストレージ使用量を 80% 到達前に可視化する。
+- **SC-009**: _(撤回)_ — 旧: 総ストレージ使用量を 80% 到達前に可視化する。
   FR-034 の撤回に伴い削除。番号は履歴のため保持。
 
 ## Assumptions

@@ -5,12 +5,8 @@
     invalid?: boolean;
   }
 
-  let {
-    invalid = false,
-    class: className = '',
-    value = $bindable(),
-    ...rest
-  }: Props = $props();
+  // svelte-ignore custom_element_props_identifier
+  let { invalid = false, class: className = '', value = $bindable(), ...rest }: Props = $props();
 
   const base =
     'w-full h-10 px-3 text-[15px] rounded-[var(--radius-micro)] border bg-canvas placeholder:text-muted-text focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-focus)] transition-colors';
@@ -19,8 +15,4 @@
   );
 </script>
 
-<input
-  bind:value
-  class="{base} {borderClass} {className}"
-  {...rest}
-/>
+<input bind:value class="{base} {borderClass} {className}" {...rest} />

@@ -18,9 +18,8 @@
   </span>
   <h1 class="text-[32px] leading-[1.05] font-bold tracking-[-1px]">アクセスが拒否されました</h1>
   <p class="text-secondary-text text-[16px] leading-relaxed">
-    このメールアドレスは sharebox の利用許可リストに登録されていません。本人のアカウントで再度ログインしてください。
+    このメールアドレスは sharebox
+    の利用許可リストに登録されていません。本人のアカウントで再度ログインしてください。
   </p>
-  <Button variant="secondary" onclick={() => (location.href = '/login')}>
-    ログイン画面に戻る
-  </Button>
+  <Button variant="secondary" onclick={() => (location.href = '/login')}>ログイン画面に戻る</Button>
 </section>

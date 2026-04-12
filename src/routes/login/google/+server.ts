@@ -11,7 +11,11 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
 
-  const authUrl = google.createAuthorizationURL(state, codeVerifier, ['openid', 'profile', 'email']);
+  const authUrl = google.createAuthorizationURL(state, codeVerifier, [
+    'openid',
+    'profile',
+    'email'
+  ]);
 
   const secure = platform.env.SESSION_COOKIE_SECURE === 'true';
   const tenMinutes = 60 * 10;

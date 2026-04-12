@@ -50,12 +50,7 @@
     <div
       class="border-border-whisper block max-w-[78%] overflow-hidden rounded-2xl rounded-tr-md border bg-canvas shadow-[var(--shadow-card)]"
     >
-      <a
-        href={entry.file.previewUrl}
-        target="_blank"
-        rel="noopener"
-        class="block no-underline"
-      >
+      <a href={entry.file.previewUrl} target="_blank" rel="noopener" class="block no-underline">
         <img
           src={entry.file.previewUrl}
           alt={entry.file.originalName}

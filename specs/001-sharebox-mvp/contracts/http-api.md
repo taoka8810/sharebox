@@ -28,6 +28,7 @@ SvelteKit の `+server.ts` および form actions が公開するエンドポイ
 ```
 
 エラーコード一覧:
+
 - `unauthorized` (401)
 - `forbidden` (403) — ホワイトリスト外
 - `validation_failed` (400)

@@ -11,6 +11,7 @@
     children: Snippet;
   }
 
+  // svelte-ignore custom_element_props_identifier
   let {
     variant = 'primary',
     size = 'md',
@@ -39,10 +40,6 @@
   };
 </script>
 
-<button
-  {type}
-  class="{base} {sizing[size]} {variantClasses[variant]} {className}"
-  {...rest}
->
+<button {type} class="{base} {sizing[size]} {variantClasses[variant]} {className}" {...rest}>
   {@render children()}
 </button>

@@ -42,7 +42,7 @@
 
   $effect(() => {
     // Re-grow when body changes (e.g. after clearing on submit).
-    body;
+    void body;
     autoGrow();
   });
 
@@ -108,7 +108,9 @@
         <ProgressBar value={uploadProgress} label={uploadingName ?? 'アップロード中...'} />
       </div>
     {/if}
-    <div class="border-border-whisper bg-canvas-warm flex items-end gap-2 rounded-[20px] border px-2 py-1.5">
+    <div
+      class="border-border-whisper bg-canvas-warm flex items-end gap-2 rounded-[20px] border px-2 py-1.5"
+    >
       <button
         type="button"
         class="text-secondary-text hover:bg-canvas inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
@@ -141,8 +143,16 @@
         class="bg-accent hover:bg-accent-hover inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition-colors active:scale-[0.95] disabled:opacity-40"
         aria-label={isUrl ? 'URL を送信' : '送信'}
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="22" y1="2" x2="11" y2="13" />
           <polygon points="22 2 15 22 11 13 2 9 22 2" />
         </svg>

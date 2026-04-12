@@ -14,10 +14,7 @@ export interface RecordLoginAttemptInput {
   userAgent: string | null;
 }
 
-export async function recordLoginAttempt(
-  db: Db,
-  input: RecordLoginAttemptInput
-): Promise<void> {
+export async function recordLoginAttempt(db: Db, input: RecordLoginAttemptInput): Promise<void> {
   await db.insert(loginAudit).values({
     attemptedAt: Date.now(),
     email: input.email,
