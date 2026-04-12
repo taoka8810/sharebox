@@ -50,23 +50,23 @@ description: "Task list for sharebox MVP implementation"
 **Purpose**: DESIGN.md のトークンを CSS 変数として固定し、全画面で再利用される
 基本コンポーネントとレイアウトシェルを構築する。バックエンドは一切触らない。
 
-- [ ] **T012** Inter フォント (woff2、weight 400/500/600/700) を `static/fonts/Inter/` に self-host
-- [ ] **T013** `src/app.css` を作成し、Tailwind v4 の `@theme` ブロックで DESIGN.md の全トークン (色、影、角丸、間隔、フォントサイズ、line-height、letter-spacing) を CSS 変数として定義
-- [ ] **T014** [P] `src/app.css` に `@font-face` ルールで Inter を読み込み、`@layer base` でグローバルタイポグラフィを適用
-- [ ] **T015** `src/routes/+layout.svelte` を作成: ヘッダ (ロゴ、ナビ、認証時はログアウトボタン枠)、最大幅 1200px のメイン領域、暖色アルタネート背景システム
-- [ ] **T016** [P] `src/lib/components/ui/Button.svelte` を作成し `variant: 'primary' | 'secondary' | 'ghost' | 'pill'` を実装 (DESIGN.md の各バリアント仕様準拠、hover で `scale(1.05)`、active で `scale(0.9)`、focus でブルーリング)
-- [ ] **T017** [P] `src/lib/components/ui/Card.svelte` を作成 (whisper border、4 層シャドウ、12px / 16px の radius slot)
-- [ ] **T018** [P] `src/lib/components/ui/Input.svelte` と `TextArea.svelte` を作成
-- [ ] **T019** [P] `src/lib/components/ui/Badge.svelte` を作成 (pill 形状、`#f2f9ff` / `#097fe8`)
-- [ ] **T020** [P] `src/lib/components/ui/Icon.svelte` を作成 (lucide-svelte ではなく必要なアイコンだけ手動でインライン SVG: clipboard, download, trash, image, video, file-text, file-archive, link, x, check, upload, log-out)
-- [ ] **T021** [P] `src/lib/components/ui/Avatar.svelte` を作成 (フォールバック initials 対応)
-- [ ] **T022** [P] `src/lib/components/ui/Toast.svelte` と `ToastHost.svelte` を作成 (成功 / エラー / 情報、auto-dismiss)
-- [ ] **T023** [P] `src/lib/components/ui/EmptyState.svelte` を作成 (アイコン + メッセージ + サブメッセージ)
-- [ ] **T024** [P] `src/lib/components/ui/Skeleton.svelte` を作成 (パルスアニメーション、矩形 / テキスト行)
-- [ ] **T025** [P] `src/lib/components/ui/ProgressBar.svelte` を作成 (アップロード進捗用)
-- [ ] **T026** `src/lib/mocks/timeline.ts` を作成し、テキスト 5 件 / 画像 2 件 / 動画 1 件 / PDF 1 件 / その他ファイル 1 件 / OGP 成功 URL 2 件 / OGP 失敗 URL 1 件のリアリスティックなモックデータを定義 (相対時刻表示の検証用に幅広い `createdAt` を持たせる)
-- [ ] **T027** [P] `src/lib/utils/relativeTime.ts` を作成 ("3 分前", "1 時間前", "昨日", "3 日前" 等の純粋関数)
-- [ ] **T028** [P] `src/lib/utils/formatBytes.ts` を作成 ("12.3 MB" 等)
+- [x] **T012** Inter フォント (woff2、weight 400/500/600/700) を `static/fonts/Inter/` に self-host
+- [x] **T013** `src/app.css` を作成し、Tailwind v4 の `@theme` ブロックで DESIGN.md の全トークン (色、影、角丸、間隔、フォントサイズ、line-height、letter-spacing) を CSS 変数として定義
+- [x] **T014** [P] `src/app.css` に `@font-face` ルールで Inter を読み込み、`@layer base` でグローバルタイポグラフィを適用
+- [x] **T015** `src/routes/+layout.svelte` を作成: ヘッダ (ロゴ、ナビ、認証時はログアウトボタン枠)、最大幅 1200px のメイン領域、暖色アルタネート背景システム
+- [x] **T016** [P] `src/lib/components/ui/Button.svelte` を作成し `variant: 'primary' | 'secondary' | 'ghost' | 'pill'` を実装 (DESIGN.md の各バリアント仕様準拠、hover で `scale(1.05)`、active で `scale(0.9)`、focus でブルーリング)
+- [x] **T017** [P] `src/lib/components/ui/Card.svelte` を作成 (whisper border、4 層シャドウ、12px / 16px の radius slot)
+- [x] **T018** [P] `src/lib/components/ui/Input.svelte` と `TextArea.svelte` を作成
+- [x] **T019** [P] `src/lib/components/ui/Badge.svelte` を作成 (pill 形状、`#f2f9ff` / `#097fe8`)
+- [x] **T020** [P] `src/lib/components/ui/Icon.svelte` を作成 (lucide-svelte ではなく必要なアイコンだけ手動でインライン SVG: clipboard, download, trash, image, video, file-text, file-archive, link, x, check, upload, log-out)
+- [x] **T021** [P] `src/lib/components/ui/Avatar.svelte` を作成 (フォールバック initials 対応)
+- [x] **T022** [P] `src/lib/components/ui/Toast.svelte` と `ToastHost.svelte` を作成 (成功 / エラー / 情報、auto-dismiss)
+- [x] **T023** [P] `src/lib/components/ui/EmptyState.svelte` を作成 (アイコン + メッセージ + サブメッセージ)
+- [x] **T024** [P] `src/lib/components/ui/Skeleton.svelte` を作成 (パルスアニメーション、矩形 / テキスト行)
+- [x] **T025** [P] `src/lib/components/ui/ProgressBar.svelte` を作成 (アップロード進捗用)
+- [x] **T026** `src/lib/mocks/timeline.ts` を作成し、テキスト 5 件 / 画像 2 件 / 動画 1 件 / PDF 1 件 / その他ファイル 1 件 / OGP 成功 URL 2 件 / OGP 失敗 URL 1 件のリアリスティックなモックデータを定義 (相対時刻表示の検証用に幅広い `createdAt` を持たせる)
+- [x] **T027** [P] `src/lib/utils/relativeTime.ts` を作成 ("3 分前", "1 時間前", "昨日", "3 日前" 等の純粋関数)
+- [x] **T028** [P] `src/lib/utils/formatBytes.ts` を作成 ("12.3 MB" 等)
 
 **Checkpoint**: 全 UI プリミティブが揃い、`/+layout.svelte` がデザインシステム
 通りに表示される状態。

@@ -1,0 +1,171 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+ * Inter font (self-hosted, weights 400/500/600/700)
+ * ========================================================================== */
+
+@font-face {
+  font-family: 'Inter';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Inter/Inter-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Inter/Inter-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Inter/Inter-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Inter/Inter-Bold.woff2') format('woff2');
+}
+
+/* ============================================================================
+ * Design System Tokens (DESIGN.md compliant)
+ *
+ * The single source of truth for all visual primitives. Tailwind v4 picks up
+ * the @theme block and exposes them both as CSS variables (--color-*, etc.)
+ * AND as utility classes (bg-canvas, text-primary, etc.).
+ * ========================================================================== */
+
+@theme {
+  /* --- Colors: Primary --- */
+  --color-canvas: #ffffff;
+  --color-canvas-warm: #f6f5f4;
+  --color-primary-text: rgb(0 0 0 / 0.95);
+  --color-secondary-text: #615d59;
+  --color-muted-text: #a39e98;
+  --color-warm-dark: #31302e;
+
+  /* --- Colors: Accent --- */
+  --color-accent: #0075de;
+  --color-accent-hover: #005bab;
+  --color-accent-focus: #097fe8;
+  --color-accent-link-light: #62aef0;
+  --color-brand-deep: #213183;
+
+  /* --- Colors: Semantic --- */
+  --color-success: #2a9d99;
+  --color-confirm: #1aae39;
+  --color-warning: #dd5b00;
+  --color-decorative-pink: #ff64c8;
+  --color-purple: #391c57;
+  --color-brown: #523410;
+
+  /* --- Colors: Badge / Pill --- */
+  --color-badge-bg: #f2f9ff;
+  --color-badge-text: #097fe8;
+
+  /* --- Borders --- */
+  --color-border-whisper: rgb(0 0 0 / 0.1);
+  --color-border-input: #dddddd;
+
+  /* --- Shadows --- */
+  --shadow-card: 0 4px 18px rgb(0 0 0 / 0.04), 0 2.025px 7.84688px rgb(0 0 0 / 0.027),
+    0 0.8px 2.925px rgb(0 0 0 / 0.02), 0 0.175px 1.04062px rgb(0 0 0 / 0.01);
+  --shadow-deep: 0 1px 3px rgb(0 0 0 / 0.01), 0 3px 7px rgb(0 0 0 / 0.02),
+    0 7px 15px rgb(0 0 0 / 0.02), 0 14px 28px rgb(0 0 0 / 0.04),
+    0 23px 52px rgb(0 0 0 / 0.05);
+
+  /* --- Radius --- */
+  --radius-micro: 4px;
+  --radius-subtle: 5px;
+  --radius-standard: 8px;
+  --radius-card: 12px;
+  --radius-large: 16px;
+  --radius-pill: 9999px;
+
+  /* --- Font family --- */
+  --font-sans:
+    'Inter', -apple-system, system-ui, 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+
+  /* --- Font sizes (matches DESIGN.md type scale) --- */
+  --font-size-display-hero: 4rem; /* 64px */
+  --font-size-display-secondary: 3.375rem; /* 54px */
+  --font-size-section: 3rem; /* 48px */
+  --font-size-subhead-lg: 2.5rem; /* 40px */
+  --font-size-subhead: 1.625rem; /* 26px */
+  --font-size-card-title: 1.375rem; /* 22px */
+  --font-size-body-lg: 1.25rem; /* 20px */
+  --font-size-body: 1rem; /* 16px */
+  --font-size-nav: 0.9375rem; /* 15px */
+  --font-size-caption: 0.875rem; /* 14px */
+  --font-size-badge: 0.75rem; /* 12px */
+}
+
+/* ============================================================================
+ * Base Layer
+ * ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: 1.5;
+    color: var(--color-primary-text);
+    background-color: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'lnum', 'locl';
+  }
+
+  /* Display headings — compressed letter spacing per DESIGN.md */
+  h1 {
+    font-size: var(--font-size-section);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1.5px;
+  }
+  h2 {
+    font-size: var(--font-size-subhead);
+    font-weight: 700;
+    line-height: 1.23;
+    letter-spacing: -0.625px;
+  }
+  h3 {
+    font-size: var(--font-size-card-title);
+    font-weight: 700;
+    line-height: 1.27;
+    letter-spacing: -0.25px;
+  }
+
+  /* Whisper-style focus ring on every focusable element */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-micro);
+  }
+
+  /* Buttons reset */
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
