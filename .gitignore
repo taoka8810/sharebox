@@ -32,6 +32,7 @@ coverage/
 playwright-report/
 test-results/
 .playwright/
+.playwright-mcp/
 
 # Claude Code local settings
 .claude/settings.local.json

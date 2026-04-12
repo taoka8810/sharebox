@@ -35,7 +35,7 @@
     自分のデバイス間で、テキスト・ファイル・URL をすばやく共有する個人用の共有ボックス。
   </p>
   <div class="mt-2 flex flex-col items-center gap-3">
-    <Button onclick={() => console.log('mock: google login')}>
+    <Button onclick={() => (window.location.href = '/login/google')}>
       <svg viewBox="0 0 18 18" width="16" height="16" aria-hidden="true">
         <g>
           <path
