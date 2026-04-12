@@ -29,17 +29,17 @@ description: "Task list for sharebox MVP implementation"
 
 **Purpose**: SvelteKit プロジェクト初期化と開発ツール一式のセットアップ
 
-- [ ] **T001** リポジトリルートに SvelteKit 2.x + Svelte 5 + TypeScript strict 構成で `pnpm create svelte@latest .` 相当の初期化を行う (`package.json`, `svelte.config.js`, `vite.config.ts`, `tsconfig.json`, `src/app.html`, `src/app.d.ts`, `src/routes/+page.svelte` を生成)
-- [ ] **T002** [P] ランタイム依存をインストール: `@sveltejs/adapter-cloudflare`, `tailwindcss@^4`, `@tailwindcss/vite`, `arctic`, `@oslojs/crypto`, `@oslojs/encoding`, `drizzle-orm`, `zod`, `node-html-parser`
-- [ ] **T003** [P] 開発依存をインストール: `drizzle-kit`, `vitest`, `@playwright/test`, `eslint`, `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, `prettier`, `prettier-plugin-svelte`, `wrangler`, `@cloudflare/workers-types`
-- [ ] **T004** [P] `tsconfig.json` を `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true` で更新
-- [ ] **T005** [P] `eslint.config.js` と `.prettierrc` を作成 (Svelte + TypeScript ルール)
-- [ ] **T006** [P] `vite.config.ts` に `@tailwindcss/vite` プラグインと `sveltekit()` を設定
-- [ ] **T007** `svelte.config.js` を `@sveltejs/adapter-cloudflare` に切り替える
-- [ ] **T008** [P] `wrangler.toml` を作成し `[[d1_databases]]` (binding=DB)、`[[r2_buckets]]` (binding=FILES) のプレースホルダを記述
-- [ ] **T009** [P] `.dev.vars.example` を作成 (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `OWNER_EMAIL`, `SESSION_COOKIE_SECURE`)
-- [ ] **T010** [P] `vitest.config.ts` と `playwright.config.ts` を作成 (Playwright は Chromium と Mobile WebKit の 2 プロジェクト)
-- [ ] **T011** [P] `package.json` の `scripts` を整備: `dev`, `build`, `preview`, `check`, `lint`, `format`, `test:unit`, `test:e2e`, `db:generate`, `db:migrate:local`, `db:migrate:remote`
+- [x] **T001** リポジトリルートに SvelteKit 2.x + Svelte 5 + TypeScript strict 構成で `pnpm create svelte@latest .` 相当の初期化を行う (`package.json`, `svelte.config.js`, `vite.config.ts`, `tsconfig.json`, `src/app.html`, `src/app.d.ts`, `src/routes/+page.svelte` を生成)
+- [x] **T002** [P] ランタイム依存をインストール: `@sveltejs/adapter-cloudflare`, `tailwindcss@^4`, `@tailwindcss/vite`, `arctic`, `@oslojs/crypto`, `@oslojs/encoding`, `drizzle-orm`, `zod`, `node-html-parser`
+- [x] **T003** [P] 開発依存をインストール: `drizzle-kit`, `vitest`, `@playwright/test`, `eslint`, `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, `prettier`, `prettier-plugin-svelte`, `wrangler`, `@cloudflare/workers-types`
+- [x] **T004** [P] `tsconfig.json` を `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true` で更新
+- [x] **T005** [P] `eslint.config.js` と `.prettierrc` を作成 (Svelte + TypeScript ルール)
+- [x] **T006** [P] `vite.config.ts` に `@tailwindcss/vite` プラグインと `sveltekit()` を設定
+- [x] **T007** `svelte.config.js` を `@sveltejs/adapter-cloudflare` に切り替える
+- [x] **T008** [P] `wrangler.toml` を作成し `[[d1_databases]]` (binding=DB)、`[[r2_buckets]]` (binding=FILES) のプレースホルダを記述
+- [x] **T009** [P] `.dev.vars.example` を作成 (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `OWNER_EMAIL`, `SESSION_COOKIE_SECURE`)
+- [x] **T010** [P] `vitest.config.ts` と `playwright.config.ts` を作成 (Playwright は Chromium と Mobile WebKit の 2 プロジェクト)
+- [x] **T011** [P] `package.json` の `scripts` を整備: `dev`, `build`, `preview`, `check`, `lint`, `format`, `test:unit`, `test:e2e`, `db:generate`, `db:migrate:local`, `db:migrate:remote`
 
 **Checkpoint**: `pnpm dev` が空ページで起動する状態。
 
