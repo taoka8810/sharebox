@@ -22,10 +22,10 @@ export interface FilePayload {
 
 export interface OgpData {
   status: OgpStatus;
-  title?: string;
-  description?: string;
+  title?: string | null;
+  description?: string | null;
   imageUrl?: string | null;
-  siteName?: string;
+  siteName?: string | null;
 }
 
 export interface UrlPayload {

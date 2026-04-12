@@ -7,20 +7,25 @@
   import FileEntry from '$lib/components/timeline/FileEntry.svelte';
   import UrlEntry from '$lib/components/timeline/UrlEntry.svelte';
   import DateSeparator from '$lib/components/timeline/DateSeparator.svelte';
-  import { mockTimeline } from '$lib/mocks/timeline';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
   import { dayKey, dayLabel } from '$lib/utils/dayLabel';
+  import { invalidateAll } from '$app/navigation';
   import type { TimelineEntry } from '$lib/types/timeline';
+  import type { PageData } from './$types';
 
-  // Phase A: timeline state seeded from mock module. Sorted oldest-first
-  // so the natural top-to-bottom reading order matches a chat app.
-  let entries = $state<TimelineEntry[]>(
-    [...mockTimeline].sort((a, b) => a.createdAt - b.createdAt)
-  );
+  let { data }: { data: PageData } = $props();
+
+  // Local state seeded from server data. Optimistic updates push into here
+  // immediately; $effect.pre below resyncs from server data on every change
+  // (initial render, after invalidateAll(), etc.) so SSR and client stay
+  // in sync without exposing a flash of empty timeline.
+  let entries = $state<TimelineEntry[]>([]);
   let scrollHost: HTMLDivElement | null = $state(null);
 
-  // Group entries by calendar day, inserting day-separator markers between
-  // groups for the chat-style separator chips.
+  $effect.pre(() => {
+    entries = [...data.entries];
+  });
+
   type Row = { kind: 'separator'; id: string; label: string } | { kind: 'entry'; entry: TimelineEntry };
 
   const rows = $derived.by<Row[]>(() => {
@@ -37,10 +42,6 @@
     return out;
   });
 
-  function newId() {
-    return `mock-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  }
-
   function scrollToBottom() {
     if (!scrollHost) return;
     queueMicrotask(() => {
@@ -49,77 +50,76 @@
   }
 
   $effect(() => {
-    // Auto-scroll on entries change.
     void entries;
     scrollToBottom();
   });
 
-  // Mock submission handlers (Phase A): append to local state.
+  // Refetch on tab visibility change so other devices' updates show up.
+  $effect(() => {
+    function onVisible() {
+      if (document.visibilityState === 'visible') {
+        invalidateAll();
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  });
 
-  async function submitText(body: string) {
-    await new Promise((r) => setTimeout(r, 200));
-    entries = [
-      ...entries,
-      { id: newId(), kind: 'text', createdAt: Date.now(), text: { body } }
-    ];
-    showToast('テキストを投稿しました', 'success');
+  async function postJson<T>(url: string, body: unknown): Promise<T> {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      let message = `${res.status}`;
+      try {
+        const errorData = (await res.json()) as { error?: { message?: string }; message?: string };
+        message = errorData?.error?.message ?? errorData?.message ?? message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+    return res.json() as Promise<T>;
   }
 
-  async function uploadFile(file: File) {
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
-    const previewUrl = isImage || isVideo ? URL.createObjectURL(file) : null;
-    entries = [
-      ...entries,
-      {
-        id: newId(),
-        kind: 'file',
-        createdAt: Date.now(),
-        file: {
-          originalName: file.name,
-          mimeType: file.type || 'application/octet-stream',
-          byteSize: file.size,
-          category: isImage ? 'image' : isVideo ? 'video' : 'other',
-          previewUrl,
-          downloadUrl: previewUrl ?? '#mock-download'
-        }
-      }
-    ];
-    showToast(`${file.name} をアップロードしました`, 'success');
+  async function submitText(body: string) {
+    const created = await postJson<TimelineEntry>('/api/entries/text', { body });
+    entries = [...entries, created];
   }
 
   async function submitUrl(url: string) {
-    await new Promise((r) => setTimeout(r, 800));
-    const parsed = new URL(url);
-    entries = [
-      ...entries,
-      {
-        id: newId(),
-        kind: 'url',
-        createdAt: Date.now(),
-        url: {
-          url,
-          domain: parsed.hostname,
-          ogp: {
-            status: 'success',
-            title: `${parsed.hostname} のページ`,
-            description: 'モック OGP データです。Phase B で本物に置き換わります。',
-            imageUrl: null,
-            siteName: parsed.hostname
-          }
-        }
-      }
-    ];
-    showToast('URL を投稿しました', 'success');
+    // Phase 7 will swap this for /api/entries/url. For now, post as text so
+    // the message still shows up (Phase 5 only ships the text path).
+    const created = await postJson<TimelineEntry>('/api/entries/text', { body: url });
+    entries = [...entries, created];
+  }
+
+  async function uploadFile(_file: File) {
+    // Phase 6 wires this up to /api/files. Until then, surface an explicit
+    // message so we never silently fail an upload.
+    throw new Error('ファイル投稿は次のフェーズで実装します');
   }
 
   async function deleteEntry(id: string) {
+    const previous = entries;
     entries = entries.filter((e) => e.id !== id);
-    showToast('削除しました', 'success');
+    try {
+      const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 404) {
+        throw new Error(`${res.status}`);
+      }
+      showToast('削除しました', 'success');
+    } catch (err) {
+      entries = previous;
+      throw err;
+    }
   }
 
-  function mockLogout() {
-    showToast('ログアウトしました (mock)', 'info');
+  async function logout() {
+    await fetch('/logout', { method: 'POST' });
+    location.href = '/login';
   }
 </script>
 
@@ -127,7 +127,6 @@
   <title>sharebox</title>
 </svelte:head>
 
-<!-- Top bar -->
 <header
   class="border-border-whisper bg-canvas/90 sticky top-0 z-20 border-b backdrop-blur"
 >
@@ -149,14 +148,13 @@
         <p class="text-muted-text text-[11px]">あなたの個人共有ボックス</p>
       </div>
     </div>
-    <Button variant="ghost" size="sm" onclick={mockLogout}>
+    <Button variant="ghost" size="sm" onclick={logout}>
       <Icon name="log-out" size={14} />
       <span class="hidden sm:inline">ログアウト</span>
     </Button>
   </div>
 </header>
 
-<!-- Scrollable timeline -->
 <div bind:this={scrollHost} class="flex-1 overflow-y-auto bg-canvas-warm">
   <div class="mx-auto flex max-w-[1200px] flex-col gap-3 px-3 py-6 sm:px-6">
     {#if rows.length === 0}
