@@ -1,105 +1,116 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
-  import Card from '$lib/components/ui/Card.svelte';
   import EmptyState from '$lib/components/ui/EmptyState.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
-  import Avatar from '$lib/components/ui/Avatar.svelte';
-  import StorageUsage from '$lib/components/StorageUsage.svelte';
-  import EntryFilter from '$lib/components/timeline/EntryFilter.svelte';
+  import MessageComposer from '$lib/components/MessageComposer.svelte';
   import TextEntry from '$lib/components/timeline/TextEntry.svelte';
   import FileEntry from '$lib/components/timeline/FileEntry.svelte';
   import UrlEntry from '$lib/components/timeline/UrlEntry.svelte';
-  import TextComposer from '$lib/components/forms/TextComposer.svelte';
-  import FileUploader from '$lib/components/forms/FileUploader.svelte';
-  import UrlComposer from '$lib/components/forms/UrlComposer.svelte';
+  import DateSeparator from '$lib/components/timeline/DateSeparator.svelte';
   import { mockTimeline } from '$lib/mocks/timeline';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
-  import type { EntryFilterKind, TimelineEntry } from '$lib/types/timeline';
+  import { dayKey, dayLabel } from '$lib/utils/dayLabel';
+  import type { TimelineEntry } from '$lib/types/timeline';
 
-  // Phase A: timeline state lives entirely in the page component, seeded
-  // from the mock module. Phase B will replace this with data loaded from
-  // +page.server.ts via Drizzle/D1.
-  let entries = $state<TimelineEntry[]>([...mockTimeline]);
-  let filter = $state<EntryFilterKind>('all');
-  let composerKind = $state<'text' | 'file' | 'url'>('text');
-
-  const counts = $derived({
-    all: entries.length,
-    text: entries.filter((e) => e.kind === 'text').length,
-    file: entries.filter((e) => e.kind === 'file').length,
-    url: entries.filter((e) => e.kind === 'url').length
-  } satisfies Record<EntryFilterKind, number>);
-
-  const filtered = $derived(
-    filter === 'all' ? entries : entries.filter((e) => e.kind === filter)
+  // Phase A: timeline state seeded from mock module. Sorted oldest-first
+  // so the natural top-to-bottom reading order matches a chat app.
+  let entries = $state<TimelineEntry[]>(
+    [...mockTimeline].sort((a, b) => a.createdAt - b.createdAt)
   );
+  let scrollHost: HTMLDivElement | null = $state(null);
 
-  const totalBytes = $derived(
-    entries.reduce((sum, e) => {
-      if (e.kind === 'text') return sum + new Blob([e.text.body]).size;
-      if (e.kind === 'file') return sum + e.file.byteSize;
-      return sum;
-    }, 0)
-  );
+  // Group entries by calendar day, inserting day-separator markers between
+  // groups for the chat-style separator chips.
+  type Row = { kind: 'separator'; id: string; label: string } | { kind: 'entry'; entry: TimelineEntry };
+
+  const rows = $derived.by<Row[]>(() => {
+    const out: Row[] = [];
+    let lastKey: string | null = null;
+    for (const entry of entries) {
+      const key = dayKey(entry.createdAt);
+      if (key !== lastKey) {
+        out.push({ kind: 'separator', id: `sep-${key}`, label: dayLabel(entry.createdAt) });
+        lastKey = key;
+      }
+      out.push({ kind: 'entry', entry });
+    }
+    return out;
+  });
 
   function newId() {
     return `mock-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   }
 
-  // Mock submission handlers (Phase A): just prepend to local state.
+  function scrollToBottom() {
+    if (!scrollHost) return;
+    queueMicrotask(() => {
+      if (scrollHost) scrollHost.scrollTop = scrollHost.scrollHeight;
+    });
+  }
+
+  $effect(() => {
+    // Auto-scroll on entries change.
+    void entries;
+    scrollToBottom();
+  });
+
+  // Mock submission handlers (Phase A): append to local state.
 
   async function submitText(body: string) {
     await new Promise((r) => setTimeout(r, 200));
-    const entry: TimelineEntry = {
-      id: newId(),
-      kind: 'text',
-      createdAt: Date.now(),
-      text: { body }
-    };
-    entries = [entry, ...entries];
+    entries = [
+      ...entries,
+      { id: newId(), kind: 'text', createdAt: Date.now(), text: { body } }
+    ];
+    showToast('テキストを投稿しました', 'success');
   }
 
   async function uploadFile(file: File) {
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
     const previewUrl = isImage || isVideo ? URL.createObjectURL(file) : null;
-    const entry: TimelineEntry = {
-      id: newId(),
-      kind: 'file',
-      createdAt: Date.now(),
-      file: {
-        originalName: file.name,
-        mimeType: file.type || 'application/octet-stream',
-        byteSize: file.size,
-        category: isImage ? 'image' : isVideo ? 'video' : 'other',
-        previewUrl,
-        downloadUrl: previewUrl ?? '#mock-download'
+    entries = [
+      ...entries,
+      {
+        id: newId(),
+        kind: 'file',
+        createdAt: Date.now(),
+        file: {
+          originalName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          byteSize: file.size,
+          category: isImage ? 'image' : isVideo ? 'video' : 'other',
+          previewUrl,
+          downloadUrl: previewUrl ?? '#mock-download'
+        }
       }
-    };
-    entries = [entry, ...entries];
+    ];
+    showToast(`${file.name} をアップロードしました`, 'success');
   }
 
   async function submitUrl(url: string) {
-    // Mock OGP fetch latency.
     await new Promise((r) => setTimeout(r, 800));
     const parsed = new URL(url);
-    const entry: TimelineEntry = {
-      id: newId(),
-      kind: 'url',
-      createdAt: Date.now(),
-      url: {
-        url,
-        domain: parsed.hostname,
-        ogp: {
-          status: 'success',
-          title: `${parsed.hostname} のページ`,
-          description: 'モック OGP データです。Phase B で本物に置き換わります。',
-          imageUrl: null,
-          siteName: parsed.hostname
+    entries = [
+      ...entries,
+      {
+        id: newId(),
+        kind: 'url',
+        createdAt: Date.now(),
+        url: {
+          url,
+          domain: parsed.hostname,
+          ogp: {
+            status: 'success',
+            title: `${parsed.hostname} のページ`,
+            description: 'モック OGP データです。Phase B で本物に置き換わります。',
+            imageUrl: null,
+            siteName: parsed.hostname
+          }
         }
       }
-    };
-    entries = [entry, ...entries];
+    ];
+    showToast('URL を投稿しました', 'success');
   }
 
   async function deleteEntry(id: string) {
@@ -113,94 +124,61 @@
 </script>
 
 <svelte:head>
-  <title>sharebox · タイムライン</title>
+  <title>sharebox</title>
 </svelte:head>
 
-<div class="flex flex-col gap-6">
-  <!-- Top bar with avatar + storage + logout -->
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-center gap-3">
-      <Avatar name="Owner" size={40} />
-      <div>
-        <p class="text-[14px] font-semibold">こんにちは</p>
-        <p class="text-secondary-text text-[12px]">あなたの個人共有ボックス</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="hidden sm:block sm:w-64">
-        <StorageUsage totalBytes={totalBytes} />
-      </div>
-      <Button variant="ghost" size="sm" onclick={mockLogout}>
-        <Icon name="log-out" size={14} />
-        ログアウト
-      </Button>
-    </div>
-  </div>
-  <div class="sm:hidden">
-    <StorageUsage totalBytes={totalBytes} />
-  </div>
-
-  <!-- Composer card with kind switcher -->
-  <Card>
-    <div class="flex flex-col gap-4">
-      <div
-        class="border-border-whisper inline-flex w-fit items-center gap-1 rounded-[var(--radius-pill)] border bg-canvas-warm p-1"
-        role="tablist"
-        aria-label="投稿種別"
+<!-- Top bar -->
+<header
+  class="border-border-whisper bg-canvas/90 sticky top-0 z-20 border-b backdrop-blur"
+>
+  <div class="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-4">
+    <div class="flex items-center gap-2.5">
+      <span
+        class="bg-accent inline-flex h-8 w-8 items-center justify-center rounded-lg text-white"
+        aria-hidden="true"
       >
-        {#each [{ id: 'text' as const, label: 'テキスト' }, { id: 'file' as const, label: 'ファイル' }, { id: 'url' as const, label: 'URL' }] as opt (opt.id)}
-          <button
-            type="button"
-            role="tab"
-            aria-selected={composerKind === opt.id}
-            onclick={() => (composerKind = opt.id)}
-            class="rounded-[var(--radius-pill)] px-3 py-1 text-[13px] font-semibold transition-colors {composerKind ===
-            opt.id
-              ? 'bg-primary-text text-white'
-              : 'text-secondary-text hover:text-primary-text'}"
-          >
-            {opt.label}
-          </button>
-        {/each}
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+      </span>
+      <div class="leading-tight">
+        <p class="text-[15px] font-semibold">sharebox</p>
+        <p class="text-muted-text text-[11px]">あなたの個人共有ボックス</p>
       </div>
-      {#if composerKind === 'text'}
-        <TextComposer onSubmit={submitText} />
-      {:else if composerKind === 'file'}
-        <FileUploader onUpload={uploadFile} />
-      {:else}
-        <UrlComposer onSubmit={submitUrl} />
-      {/if}
     </div>
-  </Card>
-
-  <!-- Filter tabs -->
-  <div class="flex items-center justify-between">
-    <h2 class="text-[20px] font-semibold tracking-[-0.25px]">タイムライン</h2>
-    <EntryFilter value={filter} {counts} onChange={(v) => (filter = v)} />
+    <Button variant="ghost" size="sm" onclick={mockLogout}>
+      <Icon name="log-out" size={14} />
+      <span class="hidden sm:inline">ログアウト</span>
+    </Button>
   </div>
+</header>
 
-  <!-- Timeline list -->
-  {#if filtered.length === 0}
-    <Card padded={false}>
+<!-- Scrollable timeline -->
+<div bind:this={scrollHost} class="flex-1 overflow-y-auto bg-canvas-warm">
+  <div class="mx-auto flex max-w-[1200px] flex-col gap-3 px-3 py-6 sm:px-6">
+    {#if rows.length === 0}
       <EmptyState
         icon="inbox"
-        title={filter === 'all' ? '最初の投稿をしてみましょう' : '該当する投稿がありません'}
-        description={filter === 'all'
-          ? '上の入力欄からテキスト・ファイル・URL を共有できます。'
-          : '別のフィルタを試してみてください。'}
+        title="最初の投稿をしてみましょう"
+        description="下の入力欄からテキスト・ファイル・URL を共有できます。URL を貼ると自動的に OGP が表示されます。"
       />
-    </Card>
-  {:else}
-    <div class="flex flex-col gap-4">
-      {#each filtered as entry (entry.id)}
-        {#if entry.kind === 'text'}
-          <TextEntry {entry} onDelete={deleteEntry} />
-        {:else if entry.kind === 'file'}
-          <FileEntry {entry} onDelete={deleteEntry} />
+    {:else}
+      {#each rows as row (row.kind === 'separator' ? row.id : row.entry.id)}
+        {#if row.kind === 'separator'}
+          <DateSeparator label={row.label} />
+        {:else if row.entry.kind === 'text'}
+          <TextEntry entry={row.entry} onDelete={deleteEntry} />
+        {:else if row.entry.kind === 'file'}
+          <FileEntry entry={row.entry} onDelete={deleteEntry} />
         {:else}
-          <UrlEntry {entry} onDelete={deleteEntry} />
+          <UrlEntry entry={row.entry} onDelete={deleteEntry} />
         {/if}
       {/each}
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
+
+<MessageComposer onSubmitText={submitText} onSubmitUrl={submitUrl} onUploadFile={uploadFile} />

@@ -1,9 +1,8 @@
 <script lang="ts">
-  import Card from '$lib/components/ui/Card.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
   import Skeleton from '$lib/components/ui/Skeleton.svelte';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
-  import { formatRelativeTime } from '$lib/utils/relativeTime';
+  import { timeLabel } from '$lib/utils/dayLabel';
   import type { TimelineEntry } from '$lib/types/timeline';
 
   interface Props {
@@ -13,7 +12,7 @@
 
   let { entry, onDelete }: Props = $props();
 
-  const relativeTime = $derived(formatRelativeTime(entry.createdAt));
+  const time = $derived(timeLabel(entry.createdAt));
 
   async function copy() {
     try {
@@ -34,13 +33,44 @@
   }
 </script>
 
-<Card padded={false}>
-  <article class="flex flex-col">
+<div class="group flex items-end justify-end gap-2">
+  <div class="text-muted-text mb-1 flex flex-col items-end gap-1 text-[11px]">
+    <span class="hidden gap-1 group-hover:flex">
+      <button
+        type="button"
+        onclick={copy}
+        class="hover:bg-canvas-warm text-secondary-text inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+        aria-label="URL をコピー"
+      >
+        <Icon name="clipboard" size={13} />
+      </button>
+      <button
+        type="button"
+        onclick={handleDelete}
+        class="hover:bg-canvas-warm text-secondary-text inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:text-[var(--color-warning)]"
+        aria-label="削除"
+      >
+        <Icon name="trash" size={13} />
+      </button>
+    </span>
+    <span>{time}</span>
+  </div>
+
+  <div class="flex max-w-[78%] flex-col gap-1.5">
+    <div
+      class="bg-badge-bg text-accent rounded-2xl rounded-tr-md px-4 py-2 text-[13px] break-all shadow-[var(--shadow-card)]"
+    >
+      <a href={entry.url.url} target="_blank" rel="noopener noreferrer" class="no-underline">
+        {entry.url.url}
+      </a>
+    </div>
+
     {#if entry.url.ogp.status === 'pending'}
-      <!-- pending: skeleton card during OGP fetch (Phase A demo state) -->
-      <div class="flex flex-col gap-3 p-4">
-        <Skeleton class="h-44 w-full" />
-        <Skeleton class="h-4 w-3/4" />
+      <div
+        class="border-border-whisper bg-canvas flex flex-col gap-2 rounded-2xl border p-3 shadow-[var(--shadow-card)]"
+      >
+        <Skeleton class="h-32 w-full" />
+        <Skeleton class="h-3 w-3/4" />
         <Skeleton class="h-3 w-1/2" />
       </div>
     {:else if entry.url.ogp.status === 'success'}
@@ -48,7 +78,7 @@
         href={entry.url.url}
         target="_blank"
         rel="noopener noreferrer"
-        class="block no-underline hover:bg-canvas-warm transition-colors rounded-[12px]"
+        class="border-border-whisper hover:bg-canvas-warm block overflow-hidden rounded-2xl border bg-canvas no-underline shadow-[var(--shadow-card)] transition-colors"
       >
         {#if entry.url.ogp.imageUrl}
           <img
@@ -56,68 +86,41 @@
             alt=""
             loading="lazy"
             decoding="async"
-            class="block max-h-[280px] w-full rounded-t-[12px] object-cover"
+            class="block max-h-[200px] w-full object-cover"
           />
         {/if}
-        <div class="flex flex-col gap-1.5 p-4">
+        <div class="flex flex-col gap-1 p-3">
           {#if entry.url.ogp.siteName}
-            <span class="text-muted-text text-[12px] font-medium">{entry.url.ogp.siteName}</span>
+            <span class="text-muted-text text-[11px] font-medium">{entry.url.ogp.siteName}</span>
           {/if}
           {#if entry.url.ogp.title}
-            <h3 class="text-primary-text text-[18px] font-semibold leading-snug tracking-[-0.25px]">
+            <h3 class="text-primary-text text-[14px] leading-snug font-semibold tracking-[-0.25px]">
               {entry.url.ogp.title}
             </h3>
           {/if}
           {#if entry.url.ogp.description}
-            <p class="text-secondary-text line-clamp-2 text-[14px] leading-relaxed">
+            <p class="text-secondary-text line-clamp-2 text-[12px] leading-relaxed">
               {entry.url.ogp.description}
             </p>
           {/if}
-          <span class="text-muted-text mt-1 text-[12px]">{entry.url.domain}</span>
         </div>
       </a>
     {:else}
-      <!-- failed: domain-only fallback -->
       <a
         href={entry.url.url}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-start gap-3 p-4 no-underline hover:bg-canvas-warm transition-colors rounded-[12px]"
+        class="border-border-whisper bg-canvas hover:bg-canvas-warm flex items-center gap-2 rounded-2xl border px-3 py-2 no-underline shadow-[var(--shadow-card)] transition-colors"
       >
         <span
-          class="text-secondary-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-black/[0.05]"
+          class="text-secondary-text inline-flex h-7 w-7 items-center justify-center rounded-md bg-black/[0.05]"
         >
-          <Icon name="link" size={20} />
+          <Icon name="link" size={14} />
         </span>
-        <div class="min-w-0 flex-1">
-          <p class="text-primary-text truncate text-[15px] font-semibold">{entry.url.domain}</p>
-          <p class="text-muted-text truncate text-[12px]">{entry.url.url}</p>
-        </div>
+        <span class="text-primary-text truncate text-[13px] font-semibold">
+          {entry.url.domain}
+        </span>
       </a>
     {/if}
-
-    <footer
-      class="border-border-whisper text-muted-text flex items-center justify-between border-t px-4 py-2 text-[12px]"
-    >
-      <span>{relativeTime}</span>
-      <span class="flex items-center gap-1">
-        <button
-          type="button"
-          onclick={copy}
-          class="hover:bg-canvas-warm text-secondary-text inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-          aria-label="URL をコピー"
-        >
-          <Icon name="clipboard" size={15} />
-        </button>
-        <button
-          type="button"
-          onclick={handleDelete}
-          class="hover:bg-canvas-warm text-secondary-text inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:text-[var(--color-warning)]"
-          aria-label="削除"
-        >
-          <Icon name="trash" size={15} />
-        </button>
-      </span>
-    </footer>
-  </article>
-</Card>
+  </div>
+</div>

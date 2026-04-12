@@ -6,7 +6,9 @@
   <title>sharebox · ログイン</title>
 </svelte:head>
 
-<section class="mx-auto flex max-w-xl flex-col items-center gap-6 py-20 text-center">
+<section
+  class="mx-auto flex max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-20 text-center"
+>
   <span
     class="bg-accent inline-flex h-14 w-14 items-center justify-center rounded-2xl text-white"
     aria-hidden="true"

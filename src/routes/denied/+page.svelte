@@ -7,7 +7,9 @@
   <title>sharebox · アクセスが拒否されました</title>
 </svelte:head>
 
-<section class="mx-auto flex max-w-md flex-col items-center gap-5 py-20 text-center">
+<section
+  class="mx-auto flex max-w-md flex-1 flex-col items-center justify-center gap-5 px-6 py-20 text-center"
+>
   <span
     class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff2e6] text-[#dd5b00]"
     aria-hidden="true"
