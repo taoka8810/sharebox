@@ -1,0 +1,14 @@
+.svelte-kit/
+build/
+dist/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+src/lib/server/db/migrations/
+
+# Vendored files from Spec Kit and its extensions — keep them as upstream
+# distributes them so future updates apply cleanly.
+.claude/
+.specify/

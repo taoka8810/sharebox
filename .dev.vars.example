@@ -1,0 +1,7 @@
+# Copy this file to .dev.vars and fill in real values for local development.
+# .dev.vars is gitignored.
+
+GOOGLE_CLIENT_ID=your-dev-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-dev-google-oauth-client-secret
+OWNER_EMAIL=you@example.com
+SESSION_COOKIE_SECURE=false
