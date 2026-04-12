@@ -96,10 +96,42 @@
     entries = [...entries, created];
   }
 
-  async function uploadFile(_file: File) {
-    // Phase 6 wires this up to /api/files. Until then, surface an explicit
-    // message so we never silently fail an upload.
-    throw new Error('ファイル投稿は次のフェーズで実装します');
+  async function uploadFile(file: File, onProgress: (pct: number) => void) {
+    // Use XHR rather than fetch so we can wire upload.onprogress to the
+    // composer's progress bar (fetch's body streams don't expose progress).
+    const created = await new Promise<TimelineEntry>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/files');
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          onProgress((event.loaded / event.total) * 100);
+        }
+      });
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText) as TimelineEntry);
+          } catch {
+            reject(new Error('invalid_response'));
+          }
+        } else {
+          let message = `${xhr.status}`;
+          try {
+            const parsed = JSON.parse(xhr.responseText) as { error?: { message?: string } };
+            message = parsed.error?.message ?? message;
+          } catch {
+            // ignore
+          }
+          reject(new Error(message));
+        }
+      });
+      xhr.addEventListener('error', () => reject(new Error('network_error')));
+      xhr.addEventListener('abort', () => reject(new Error('aborted')));
+      const formData = new FormData();
+      formData.append('file', file);
+      xhr.send(formData);
+    });
+    entries = [...entries, created];
   }
 
   async function deleteEntry(id: string) {

@@ -10,7 +10,7 @@
   interface Props {
     onSubmitText: (body: string) => Promise<void> | void;
     onSubmitUrl: (url: string) => Promise<void> | void;
-    onUploadFile: (file: File) => Promise<void> | void;
+    onUploadFile: (file: File, onProgress: (pct: number) => void) => Promise<void> | void;
   }
 
   let { onSubmitText, onSubmitUrl, onUploadFile }: Props = $props();
@@ -86,16 +86,11 @@
     }
     uploadingName = file.name;
     uploadProgress = 0;
-    const tick = setInterval(() => {
-      uploadProgress = Math.min(95, (uploadProgress ?? 0) + Math.random() * 18);
-    }, 80);
     try {
-      await new Promise((r) => setTimeout(r, 1000));
-      clearInterval(tick);
-      uploadProgress = 100;
-      await onUploadFile(file);
+      await onUploadFile(file, (pct) => {
+        uploadProgress = pct;
+      });
     } catch (err) {
-      clearInterval(tick);
       showToast(err instanceof Error ? err.message : 'アップロードに失敗しました', 'error');
     } finally {
       setTimeout(() => {
