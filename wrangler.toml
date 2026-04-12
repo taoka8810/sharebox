@@ -8,7 +8,7 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 [[d1_databases]]
 binding = "DB"
 database_name = "sharebox-db"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "4ff92b85-1a66-4418-b8ca-c6398d5889e0"
 migrations_dir = "src/lib/server/db/migrations"
 
 [[r2_buckets]]
