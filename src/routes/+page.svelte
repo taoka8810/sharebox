@@ -162,27 +162,13 @@
 <header class="border-border-whisper bg-canvas/90 sticky top-0 z-20 border-b backdrop-blur">
   <div class="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-4">
     <div class="flex items-center gap-2.5">
-      <span
-        class="bg-accent inline-flex h-8 w-8 items-center justify-center rounded-lg text-white"
-        aria-hidden="true"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path
-            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-          />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1="12" y1="22.08" x2="12" y2="12" />
-        </svg>
-      </span>
+      <img
+        src="/apple-touch-icon.png"
+        alt=""
+        width="32"
+        height="32"
+        class="h-8 w-8 rounded-[22%]"
+      />
       <div class="leading-tight">
         <p class="text-[15px] font-semibold">sharebox</p>
         <p class="text-muted-text text-[11px]">あなたの個人共有ボックス</p>

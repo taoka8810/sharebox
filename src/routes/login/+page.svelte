@@ -9,27 +9,7 @@
 <section
   class="mx-auto flex max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-20 text-center"
 >
-  <span
-    class="bg-accent inline-flex h-14 w-14 items-center justify-center rounded-2xl text-white"
-    aria-hidden="true"
-  >
-    <svg
-      viewBox="0 0 24 24"
-      width="28"
-      height="28"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.25"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path
-        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-      />
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-      <line x1="12" y1="22.08" x2="12" y2="12" />
-    </svg>
-  </span>
+  <img src="/apple-touch-icon.png" alt="" width="56" height="56" class="h-14 w-14 rounded-[22%]" />
   <h1 class="text-[48px] leading-[1] font-bold tracking-[-1.5px]">sharebox</h1>
   <p class="text-secondary-text max-w-md text-[18px] leading-relaxed">
     自分のデバイス間で、テキスト・ファイル・URL をすばやく共有する個人用の共有ボックス。
