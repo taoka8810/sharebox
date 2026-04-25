@@ -2,7 +2,10 @@
   import Icon from '$lib/components/ui/Icon.svelte';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
   import { timeLabel } from '$lib/utils/dayLabel';
+  import { longpress } from '$lib/utils/longpress';
   import type { TimelineEntry } from '$lib/types/timeline';
+  import MessageActionMenu from './MessageActionMenu.svelte';
+  import type { MessageAction } from './messageAction';
 
   interface Props {
     entry: Extract<TimelineEntry, { kind: 'text' }>;
@@ -12,6 +15,8 @@
   let { entry, onDelete }: Props = $props();
 
   const time = $derived(timeLabel(entry.createdAt));
+
+  let menuOpen = $state(false);
 
   async function copy() {
     try {
@@ -30,6 +35,11 @@
       showToast(err instanceof Error ? err.message : '削除に失敗しました', 'error');
     }
   }
+
+  const menuActions: MessageAction[] = [
+    { label: 'コピー', icon: 'clipboard', onSelect: copy },
+    { label: '削除', icon: 'trash', onSelect: handleDelete, danger: true }
+  ];
 </script>
 
 <div class="group flex items-end justify-end gap-2">
@@ -56,8 +66,13 @@
   </div>
   <div
     class="bg-badge-bg text-primary-text max-w-[78%] rounded-2xl rounded-tr-md px-4 py-2.5 shadow-[var(--shadow-card)]"
+    use:longpress={{ onTrigger: () => (menuOpen = true) }}
   >
     <pre class="font-sans text-[15px] leading-relaxed whitespace-pre-wrap break-words">{entry.text
         .body}</pre>
   </div>
 </div>
+
+{#if menuOpen}
+  <MessageActionMenu actions={menuActions} onClose={() => (menuOpen = false)} />
+{/if}

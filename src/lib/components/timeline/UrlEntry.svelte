@@ -3,7 +3,10 @@
   import Skeleton from '$lib/components/ui/Skeleton.svelte';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
   import { timeLabel } from '$lib/utils/dayLabel';
+  import { longpress } from '$lib/utils/longpress';
   import type { TimelineEntry } from '$lib/types/timeline';
+  import MessageActionMenu from './MessageActionMenu.svelte';
+  import type { MessageAction } from './messageAction';
 
   interface Props {
     entry: Extract<TimelineEntry, { kind: 'url' }>;
@@ -13,6 +16,8 @@
   let { entry, onDelete }: Props = $props();
 
   const time = $derived(timeLabel(entry.createdAt));
+
+  let menuOpen = $state(false);
 
   async function copy() {
     try {
@@ -31,6 +36,16 @@
       showToast(err instanceof Error ? err.message : '削除に失敗しました', 'error');
     }
   }
+
+  function openUrl() {
+    window.open(entry.url.url, '_blank', 'noopener,noreferrer');
+  }
+
+  const menuActions: MessageAction[] = [
+    { label: 'リンクを開く', icon: 'link', onSelect: openUrl },
+    { label: 'URL をコピー', icon: 'clipboard', onSelect: copy },
+    { label: '削除', icon: 'trash', onSelect: handleDelete, danger: true }
+  ];
 </script>
 
 <div class="group flex items-end justify-end gap-2">
@@ -59,6 +74,7 @@
   <div class="flex max-w-[78%] flex-col gap-1.5">
     <div
       class="bg-badge-bg text-accent rounded-2xl rounded-tr-md px-4 py-2 text-[13px] break-all shadow-[var(--shadow-card)]"
+      use:longpress={{ onTrigger: () => (menuOpen = true) }}
     >
       <a href={entry.url.url} target="_blank" rel="noopener noreferrer" class="no-underline">
         {entry.url.url}
@@ -124,3 +140,7 @@
     {/if}
   </div>
 </div>
+
+{#if menuOpen}
+  <MessageActionMenu actions={menuActions} onClose={() => (menuOpen = false)} />
+{/if}

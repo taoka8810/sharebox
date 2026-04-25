@@ -3,7 +3,10 @@
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
   import { formatBytes } from '$lib/utils/formatBytes';
   import { timeLabel } from '$lib/utils/dayLabel';
+  import { longpress } from '$lib/utils/longpress';
   import type { TimelineEntry } from '$lib/types/timeline';
+  import MessageActionMenu from './MessageActionMenu.svelte';
+  import type { MessageAction } from './messageAction';
 
   interface Props {
     entry: Extract<TimelineEntry, { kind: 'file' }>;
@@ -13,6 +16,8 @@
   let { entry, onDelete }: Props = $props();
 
   const time = $derived(timeLabel(entry.createdAt));
+
+  let menuOpen = $state(false);
 
   function iconForMime(mime: string): IconName {
     if (mime.startsWith('image/')) return 'image';
@@ -31,6 +36,21 @@
       showToast(err instanceof Error ? err.message : '削除に失敗しました', 'error');
     }
   }
+
+  function download() {
+    const a = document.createElement('a');
+    a.href = entry.file.downloadUrl;
+    a.download = entry.file.originalName;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  const menuActions: MessageAction[] = [
+    { label: 'ダウンロード', icon: 'download', onSelect: download },
+    { label: '削除', icon: 'trash', onSelect: handleDelete, danger: true }
+  ];
 </script>
 
 <div class="group flex items-end justify-end gap-2">
@@ -49,6 +69,7 @@
   {#if entry.file.category === 'image' && entry.file.previewUrl}
     <div
       class="border-border-whisper block max-w-[78%] overflow-hidden rounded-2xl rounded-tr-md border bg-canvas shadow-[var(--shadow-card)]"
+      use:longpress={{ onTrigger: () => (menuOpen = true) }}
     >
       <a href={entry.file.previewUrl} target="_blank" rel="noopener" class="block no-underline">
         <img
@@ -78,6 +99,7 @@
   {:else if entry.file.category === 'video' && entry.file.previewUrl}
     <div
       class="border-border-whisper block max-w-[78%] overflow-hidden rounded-2xl rounded-tr-md border bg-canvas shadow-[var(--shadow-card)]"
+      use:longpress={{ onTrigger: () => (menuOpen = true) }}
     >
       <!-- svelte-ignore a11y_media_has_caption -->
       <video
@@ -105,6 +127,7 @@
   {:else}
     <div
       class="border-border-whisper bg-canvas flex max-w-[78%] items-center gap-3 rounded-2xl rounded-tr-md border px-4 py-3 shadow-[var(--shadow-card)]"
+      use:longpress={{ onTrigger: () => (menuOpen = true) }}
     >
       <span
         class="text-secondary-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-black/[0.05]"
@@ -126,3 +149,7 @@
     </div>
   {/if}
 </div>
+
+{#if menuOpen}
+  <MessageActionMenu actions={menuActions} onClose={() => (menuOpen = false)} />
+{/if}
