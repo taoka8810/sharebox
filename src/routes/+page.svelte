@@ -162,13 +162,7 @@
 <header class="border-border-whisper bg-canvas/90 sticky top-0 z-20 border-b backdrop-blur">
   <div class="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-3 px-3 sm:px-4">
     <div class="flex items-center gap-2.5">
-      <img
-        src="/apple-touch-icon.png"
-        alt=""
-        width="32"
-        height="32"
-        class="h-8 w-8 rounded-[22%]"
-      />
+      <img src="/apple-touch-icon.png" alt="" width="32" height="32" class="h-8 w-8" />
       <div class="leading-tight">
         <p class="text-[15px] font-semibold">sharebox</p>
         <p class="text-muted-text text-[11px]">あなたの個人共有ボックス</p>
