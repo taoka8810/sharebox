@@ -56,6 +56,38 @@
     scrollToBottom();
   });
 
+  // OGP and file preview images load lazily, so they don't contribute to
+  // scrollHeight on first paint — the initial scrollToBottom() above lands
+  // short and the user sees the top. Watch the inner content for size
+  // changes and re-pin to the bottom while the user is sitting there.
+  // If they've scrolled up to read older entries, stop following so we
+  // don't yank them away mid-read.
+  $effect(() => {
+    if (!scrollHost) return;
+    const inner = scrollHost.firstElementChild;
+    if (!inner) return;
+
+    let stickToBottom = true;
+    function onScroll() {
+      if (!scrollHost) return;
+      const distance = scrollHost.scrollHeight - scrollHost.scrollTop - scrollHost.clientHeight;
+      stickToBottom = distance < 80;
+    }
+    scrollHost.addEventListener('scroll', onScroll, { passive: true });
+
+    const ro = new ResizeObserver(() => {
+      if (stickToBottom && scrollHost) {
+        scrollHost.scrollTop = scrollHost.scrollHeight;
+      }
+    });
+    ro.observe(inner);
+
+    return () => {
+      ro.disconnect();
+      scrollHost?.removeEventListener('scroll', onScroll);
+    };
+  });
+
   // Refetch on tab visibility change so other devices' updates show up.
   $effect(() => {
     function onVisible() {
