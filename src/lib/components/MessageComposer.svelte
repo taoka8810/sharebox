@@ -85,7 +85,13 @@
     // reset can yield an empty list on some browsers.
     const list = input.files ? Array.from(input.files) : [];
     input.value = '';
-    if (list.length === 0) return;
+    if (list.length === 0) {
+      // Surface the silent case where the picker closed without delivering
+      // a file (e.g. Android Chrome occasionally returns an empty FileList
+      // for large videos shared via content:// URIs).
+      showToast('ファイルが取得できませんでした', 'error');
+      return;
+    }
 
     const accepted = list.filter((f) => f.size <= FILE_MAX);
     const oversized = list.length - accepted.length;
@@ -160,7 +166,6 @@
         bind:this={videoInputEl}
         type="file"
         accept="video/*"
-        multiple
         class="hidden"
         onchange={(e) => handleFiles(e.currentTarget as HTMLInputElement)}
       />
