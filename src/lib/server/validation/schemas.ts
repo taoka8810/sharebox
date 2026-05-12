@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
 export const TEXT_MAX_CHARS = 100_000;
-export const FILE_MAX_BYTES = 50 * 1024 * 1024;
+// Sits just under Cloudflare Workers' 100 MB request-body cap (Free plan)
+// so the multipart envelope still fits. Raise alongside the plan if we
+// upgrade to Paid (500 MB cap).
+export const FILE_MAX_BYTES = 99 * 1024 * 1024;
 
 export const textPostSchema = z.object({
   body: z

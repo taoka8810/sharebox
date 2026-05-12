@@ -89,7 +89,7 @@ describe('sanitizeFileName', () => {
 });
 
 describe('fileUploadConstraints', () => {
-  test('exposes the 50 MB cap as a constant', () => {
-    expect(fileUploadConstraints.maxBytes).toBe(50 * 1024 * 1024);
+  test('exposes the upload size cap as a constant', () => {
+    expect(fileUploadConstraints.maxBytes).toBe(99 * 1024 * 1024);
   });
 });

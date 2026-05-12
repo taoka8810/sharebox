@@ -7,7 +7,10 @@
   import { formatBytes } from '$lib/utils/formatBytes';
 
   const TEXT_MAX = 100_000;
-  const FILE_MAX = 50 * 1024 * 1024;
+  // Cloudflare Workers Free plan caps the request body at 100 MB. Stay just
+  // under that so multipart encoding overhead doesn't push us over the edge
+  // limit, which would 413 before reaching our handler.
+  const FILE_MAX = 99 * 1024 * 1024;
 
   interface Props {
     onSubmitText: (body: string) => Promise<void> | void;
@@ -80,10 +83,6 @@
   }
 
   async function handleFiles(input: HTMLInputElement) {
-    // TEMP DEBUG: confirm whether onchange fires at all on the failing
-    // Android video flow. Remove once root cause is identified.
-    showToast(`onchange: files=${input.files?.length ?? 0}`, 'success');
-
     // Snapshot the picked files before clearing the input value below, since
     // the FileList reference is tied to the input and reading it after the
     // reset can yield an empty list on some browsers.
