@@ -22,7 +22,8 @@
   let uploadProgress = $state<number | null>(null);
   let uploadingName = $state<string | null>(null);
   let textareaEl: HTMLTextAreaElement | null = $state(null);
-  let mediaInputEl: HTMLInputElement | null = $state(null);
+  let imageInputEl: HTMLInputElement | null = $state(null);
+  let videoInputEl: HTMLInputElement | null = $state(null);
   let fileInputEl: HTMLInputElement | null = $state(null);
   let attachMenuOpen = $state(false);
 
@@ -122,7 +123,8 @@
   }
 
   const attachActions: MessageAction[] = [
-    { label: '写真・動画', icon: 'image', onSelect: () => mediaInputEl?.click() },
+    { label: '写真', icon: 'image', onSelect: () => imageInputEl?.click() },
+    { label: '動画', icon: 'video', onSelect: () => videoInputEl?.click() },
     { label: 'ファイル', icon: 'file', onSelect: () => fileInputEl?.click() }
   ];
 </script>
@@ -147,9 +149,17 @@
         <Icon name="upload" size={18} />
       </button>
       <input
-        bind:this={mediaInputEl}
+        bind:this={imageInputEl}
         type="file"
-        accept="image/*,video/*"
+        accept="image/*"
+        multiple
+        class="hidden"
+        onchange={(e) => handleFiles(e.currentTarget as HTMLInputElement)}
+      />
+      <input
+        bind:this={videoInputEl}
+        type="file"
+        accept="video/*"
         multiple
         class="hidden"
         onchange={(e) => handleFiles(e.currentTarget as HTMLInputElement)}
