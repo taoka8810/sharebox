@@ -80,6 +80,10 @@
   }
 
   async function handleFiles(input: HTMLInputElement) {
+    // TEMP DEBUG: confirm whether onchange fires at all on the failing
+    // Android video flow. Remove once root cause is identified.
+    showToast(`onchange: files=${input.files?.length ?? 0}`, 'success');
+
     // Snapshot the picked files before clearing the input value below, since
     // the FileList reference is tied to the input and reading it after the
     // reset can yield an empty list on some browsers.
