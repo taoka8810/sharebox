@@ -1,6 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/components/ui/Icon.svelte';
   import ProgressBar from '$lib/components/ui/ProgressBar.svelte';
+  import MessageActionMenu from '$lib/components/timeline/MessageActionMenu.svelte';
+  import type { MessageAction } from '$lib/components/timeline/messageAction';
   import { showToast } from '$lib/components/ui/toast-store.svelte.js';
   import { formatBytes } from '$lib/utils/formatBytes';
 
@@ -20,7 +22,9 @@
   let uploadProgress = $state<number | null>(null);
   let uploadingName = $state<string | null>(null);
   let textareaEl: HTMLTextAreaElement | null = $state(null);
+  let mediaInputEl: HTMLInputElement | null = $state(null);
   let fileInputEl: HTMLInputElement | null = $state(null);
+  let attachMenuOpen = $state(false);
 
   const trimmed = $derived(body.trim());
   const isUrl = $derived.by(() => {
@@ -74,24 +78,41 @@
     }
   }
 
-  async function handleFiles(files: FileList | null) {
+  async function handleFiles(input: HTMLInputElement) {
+    const files = input.files;
+    // Reset the input value so re-selecting the same file(s) still fires
+    // onchange next time.
+    input.value = '';
     if (!files || files.length === 0) return;
-    const file = files[0]!;
-    if (file.size > FILE_MAX) {
+
+    const list = Array.from(files);
+    const accepted = list.filter((f) => f.size <= FILE_MAX);
+    const oversized = list.length - accepted.length;
+    if (oversized > 0) {
       showToast(
-        `サイズ上限 ${formatBytes(FILE_MAX)} を超えています (${formatBytes(file.size)})`,
+        `${oversized} 件がサイズ上限 ${formatBytes(FILE_MAX)} を超えたためスキップしました`,
         'error'
       );
-      return;
     }
-    uploadingName = file.name;
-    uploadProgress = 0;
+    if (accepted.length === 0) return;
+
     try {
-      await onUploadFile(file, (pct) => {
-        uploadProgress = pct;
-      });
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'アップロードに失敗しました', 'error');
+      for (let i = 0; i < accepted.length; i++) {
+        const file = accepted[i]!;
+        uploadingName =
+          accepted.length > 1 ? `${file.name} (${i + 1}/${accepted.length})` : file.name;
+        uploadProgress = 0;
+        try {
+          await onUploadFile(file, (pct) => {
+            uploadProgress = pct;
+          });
+        } catch (err) {
+          showToast(
+            err instanceof Error ? err.message : `${file.name} のアップロードに失敗しました`,
+            'error'
+          );
+        }
+      }
     } finally {
       setTimeout(() => {
         uploadProgress = null;
@@ -99,6 +120,11 @@
       }, 400);
     }
   }
+
+  const attachActions: MessageAction[] = [
+    { label: '写真・動画', icon: 'image', onSelect: () => mediaInputEl?.click() },
+    { label: 'ファイル', icon: 'file', onSelect: () => fileInputEl?.click() }
+  ];
 </script>
 
 <div class="border-border-whisper bg-canvas/95 border-t backdrop-blur">
@@ -115,16 +141,25 @@
         type="button"
         class="text-secondary-text hover:bg-canvas inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
         aria-label="ファイルを添付"
-        onclick={() => fileInputEl?.click()}
+        onclick={() => (attachMenuOpen = true)}
         disabled={submitting || uploadProgress !== null}
       >
         <Icon name="upload" size={18} />
       </button>
       <input
+        bind:this={mediaInputEl}
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="hidden"
+        onchange={(e) => handleFiles(e.currentTarget as HTMLInputElement)}
+      />
+      <input
         bind:this={fileInputEl}
         type="file"
+        multiple
         class="hidden"
-        onchange={(e) => handleFiles((e.currentTarget as HTMLInputElement).files)}
+        onchange={(e) => handleFiles(e.currentTarget as HTMLInputElement)}
       />
       <textarea
         bind:this={textareaEl}
@@ -160,3 +195,7 @@
     </div>
   </div>
 </div>
+
+{#if attachMenuOpen}
+  <MessageActionMenu actions={attachActions} onClose={() => (attachMenuOpen = false)} />
+{/if}
