@@ -185,6 +185,17 @@
     await fetch('/logout', { method: 'POST' });
     location.href = '/login';
   }
+
+  let reloading = $state(false);
+  async function reload() {
+    if (reloading) return;
+    reloading = true;
+    try {
+      await invalidateAll();
+    } finally {
+      reloading = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -200,10 +211,21 @@
         <p class="text-muted-text text-[11px]">あなたの個人共有ボックス</p>
       </div>
     </div>
-    <Button variant="ghost" size="sm" onclick={logout}>
-      <Icon name="log-out" size={14} />
-      <span class="hidden sm:inline">ログアウト</span>
-    </Button>
+    <div class="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        onclick={reload}
+        disabled={reloading}
+        aria-label="再読み込み"
+      >
+        <Icon name="refresh-cw" size={14} class={reloading ? 'animate-spin' : ''} />
+      </Button>
+      <Button variant="ghost" size="sm" onclick={logout}>
+        <Icon name="log-out" size={14} />
+        <span class="hidden sm:inline">ログアウト</span>
+      </Button>
+    </div>
   </div>
 </header>
 

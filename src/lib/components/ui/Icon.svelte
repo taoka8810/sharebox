@@ -16,7 +16,8 @@
     | 'upload'
     | 'log-out'
     | 'alert-circle'
-    | 'inbox';
+    | 'inbox'
+    | 'refresh-cw';
 </script>
 
 <script lang="ts">
@@ -112,5 +113,10 @@
     <path
       d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
     />
+  {:else if name === 'refresh-cw'}
+    <polyline points="23 4 23 10 17 10" />
+    <polyline points="1 20 1 14 7 14" />
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10" />
+    <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14" />
   {/if}
 </svg>

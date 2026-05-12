@@ -35,6 +35,12 @@ export const GET: RequestHandler = async ({ params, locals, platform }) => {
   // Use `inline` so the same URL works for the inline image/video preview
   // tags. The HTML5 download attribute on the FileEntry anchor still forces
   // a download when the user explicitly clicks the DL link.
+  //
+  // R2 keys are per-entry and never reused, so the bytes at this URL are
+  // immutable for the URL's entire lifetime — cache aggressively on the
+  // device so reloads don't re-fetch megabytes of photos/videos. `private`
+  // keeps it out of any shared (Cloudflare edge / proxy) cache since the
+  // endpoint is auth-gated.
   const safeName = encodeURIComponent(row.file.originalName);
   return new Response(obj.body, {
     status: 200,
@@ -42,7 +48,7 @@ export const GET: RequestHandler = async ({ params, locals, platform }) => {
       'content-type': row.file.mimeType,
       'content-length': String(row.file.byteSize),
       'content-disposition': `inline; filename*=UTF-8''${safeName}`,
-      'cache-control': 'private, max-age=0'
+      'cache-control': 'private, max-age=31536000, immutable'
     }
   });
 };
