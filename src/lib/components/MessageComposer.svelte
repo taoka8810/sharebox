@@ -79,13 +79,13 @@
   }
 
   async function handleFiles(input: HTMLInputElement) {
-    const files = input.files;
-    // Reset the input value so re-selecting the same file(s) still fires
-    // onchange next time.
+    // Snapshot the picked files before clearing the input value below, since
+    // the FileList reference is tied to the input and reading it after the
+    // reset can yield an empty list on some browsers.
+    const list = input.files ? Array.from(input.files) : [];
     input.value = '';
-    if (!files || files.length === 0) return;
+    if (list.length === 0) return;
 
-    const list = Array.from(files);
     const accepted = list.filter((f) => f.size <= FILE_MAX);
     const oversized = list.length - accepted.length;
     if (oversized > 0) {
